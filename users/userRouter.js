@@ -52,7 +52,7 @@ router.get('/:id', validateUserId, (req, res) => {
     })
 });
 
-router.get('/:id/posts', validateUserId, (req, res) => {
+router.get('/:id/posts', validateUserId, validatePost, (req, res) => {
     const id = req.params.id;
 
     db.getUserPosts(id)
