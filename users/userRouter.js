@@ -8,13 +8,7 @@ const postdb = require('../posts/postDb');
 
 router.post('/', validateUser, (req, res) => {
     const newUser = req.body;
-
-    db.get()
-        .then(users => { //checking for if a user with the same name exists as the one in the req then send the 400 message
-                if (users.find(item =>item.name === req.body.name)){
-                    res.status(400).json({ error: "A user with this name already exists!"})
-                }
-        })
+    
     db.insert(newUser)
     .then(user => {
         res.status(201).json(user);
@@ -105,6 +99,9 @@ router.put('/:id', validateUserId, validateUser, (req, res) => {
     
 });
 
+//user.id is a number
+//req.user is a string
+
 //custom middleware
 
 function validateUserId(req, res, next) {
@@ -130,7 +127,15 @@ function validateUser(req, res, next) {
     } else if (!req.body.name){
         res.status(400).json({ message: "Missing required name field"});
     } else {
-        next();
+        db.get()
+        .then(users => { //checking for if a user with the same name exists as the one in the req then send the 400 message
+                if (users.find(item =>item.name === req.body.name)){
+                    res.status(400).json({ error: "A user with this name already exists!"})
+                } else {
+                    next();
+                }
+        })
+        .catch(err => res.status(500).json({ err: "Internal error", source: "validateUser middleware"}))
     }
 };
 
