@@ -9,6 +9,12 @@ const postdb = require('../posts/postDb');
 router.post('/', validateUser, (req, res) => {
     const newUser = req.body;
 
+    db.get()
+        .then(users => { //checking for if a user with the same name exists as the one in the req then send the 400 message
+                if (users.find(item.name === req.body.name)){
+                    res.status(400).json({ error: "A user with this name already exists!"})
+                }
+        })
     db.insert(newUser)
     .then(user => {
         res.status(200).json(user);
@@ -125,7 +131,7 @@ function validateUser(req, res, next) {
 function validatePost(req, res, next) {
     if(!req.body){
         res.status(400).json({ message: "Missing post data."})
-    } else if (!req.body.name){
+    } else if (!req.body.text){
         res.status(400).json({ message: "Missing required text field"});
     } else {
         next();
